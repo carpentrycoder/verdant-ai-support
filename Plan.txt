@@ -1,0 +1,151 @@
+rough Project
+verdant-ai-support/
+│
+├── backend/
+│   ├── app/
+│   │   ├── main.py
+│   │   │
+│   │   ├── api/
+│   │   │   ├── auth.py
+│   │   │   ├── webhook.py
+│   │   │   ├── conversations.py
+│   │   │   └── customers.py
+│   │   │
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   │   ├── ai_service.py
+│   │   │   └── webhook_service.py
+│   │   │
+│   │   ├── db/
+│   │   └── core/
+│   │
+│   ├── requirements.txt
+│   └── .env.example
+│
+├── frontend/
+│   ├── app/
+│   │   ├── login/
+│   │   ├── customer/
+│   │   └── agent/
+│   │
+│   └── components/
+│
+└── README.md
+
+
+STEP 1 → Architecture + DB schema
+STEP 2 → FastAPI project setup
+STEP 3 → Models + PostgreSQL
+STEP 4 → Webhook + HMAC verification
+STEP 5 → AI draft generation + Knowledge Base
+STEP 6 → Agent authentication
+STEP 7 → Conversation APIs
+STEP 8 → React/Next.js frontend
+STEP 9 → Customer ↔ Agent full flow
+STEP 10 → Error handling + tests
+STEP 11 → Deployment
+STEP 12 → README + demo flow
+
+
+Architecture :
+                 ┌─────────────────────┐
+                 │      Frontend       │
+                 │  Customer / Agent   │
+                 └──────────┬──────────┘
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │       FastAPI       │
+                 │                     │
+                 │  API / Controllers  │
+                 └──────────┬──────────┘
+                            │
+              ┌─────────────┼───────────────┐
+              │             │               │
+              ▼             ▼               ▼
+        Auth Service    Message Service    AI Service
+              │             │               │
+              │             │         Knowledge Base
+              │             │               │
+              └─────────────┼───────────────┘
+                            ▼
+                      PostgreSQL
+
+tablels :
+agents
+customers
+conversations
+messages
+ai_drafts
+
+schema:
+
+CUSTOMERS
+   │
+   │ 1:N
+   ▼
+CONVERSATIONS
+   │
+   ├────────────── 1:N ──────────────┐
+   ▼                                 ▼
+MESSAGES                         AI_DRAFTS
+   ▲                                 │
+   │                                 │
+   └──── draft answers message ──────┘
+
+
+AGENTS
+   │
+   │ approves
+   ▼
+AI_DRAFTS
+
+
+schemas :
+Agent
+├── AgentBase
+├── AgentCreate
+└── AgentResponse
+
+Auth
+├── LoginRequest
+├── TokenResponse
+└── LoginResponse
+
+Customer
+├── CustomerBase
+├── CustomerCreate
+├── CustomerUpdate
+└── CustomerResponse
+
+Conversation
+├── ConversationCreate
+├── ConversationStatusUpdate
+└── ConversationResponse
+
+Message
+├── MessageCreate
+└── MessageResponse
+
+AI Draft
+├── AiDraftCreate
+├── AiDraftApprove
+└── AiDraftResponse
+
+
+schemas webhook.py :
+payload type : 
+{
+  "event_id": "evt_7f3a91c2",
+  "customer": {
+    "id": "cust_1042",
+    "name": "Rahul Sharma",
+    "phone": "+919876543210"
+  },
+  "message": {
+    "id": "msg_88213",
+    "text": "What is your return policy?",
+    "created_at": "2026-10-30T16:00:00Z"
+  }
+}
