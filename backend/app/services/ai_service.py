@@ -107,8 +107,13 @@ def generate_ai_draft(
     try:
         completion = client.chat.completions.create(
             model=settings.GROQ_MODEL,
+
             temperature=settings.AI_TEMPERATURE,
+
             max_tokens=settings.AI_MAX_TOKENS,
+
+            reasoning_format="hidden",
+
             messages=[
                 {
                     "role": "system",
@@ -121,18 +126,31 @@ def generate_ai_draft(
                         f"{knowledge_context}\n\n"
                         "Customer message:\n"
                         f"{cleaned_message}\n\n"
-                        "Prepare a suggested reply for an agent to review."
+                        "Prepare a suggested reply "
+                        "for an agent to review."
                     ),
                 },
             ],
         )
 
         draft_text = (
-            completion.choices[0].message.content or ""
+            completion.choices[0]
+            .message.content
+            or ""
         ).strip()
 
+
         if not draft_text:
-            raise ValueError("AI provider returned an empty draft")
+            raise ValueError(
+                "AI provider returned an empty draft"
+            )
+
+
+        logger.info(
+            "Groq AI draft generated successfully model=%s",
+            settings.GROQ_MODEL,
+        )
+
 
         return GeneratedDraft(
             text=draft_text,

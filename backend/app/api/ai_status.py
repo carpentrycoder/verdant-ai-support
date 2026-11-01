@@ -27,6 +27,7 @@ class AiStatusResponse(BaseModel):
     reachable: bool
     provider: str
     model: str
+    response_received: bool
 
 
 @router.get(
@@ -58,33 +59,43 @@ def get_ai_status(
     try:
         completion = client.chat.completions.create(
             model=settings.GROQ_MODEL,
-            temperature=0,
-            max_tokens=10,
+
             messages=[
                 {
                     "role": "user",
                     "content": (
-                        "Reply using only the word OK."
+                        "Reply with exactly: OK"
                     ),
                 },
             ],
+
+            temperature=0,
+
+            max_tokens=128,
+
+            reasoning_format="hidden",
         )
 
-        result = (
+        message = (
             completion
             .choices[0]
-            .message.content
+            .message
+        )
+
+        response_text = (
+            message.content
             or ""
         ).strip()
 
-        if not result:
-            raise ValueError(
-                "Groq returned an empty response"
-            )
-
         logger.info(
-            "Groq connectivity test succeeded model=%s",
+            (
+                "Groq connectivity test succeeded "
+                "model=%s agent_id=%s "
+                "response_received=%s"
+            ),
             settings.GROQ_MODEL,
+            current_agent.id,
+            bool(response_text),
         )
 
         return AiStatusResponse(
@@ -93,12 +104,19 @@ def get_ai_status(
             reachable=True,
             provider="groq",
             model=settings.GROQ_MODEL,
+            response_received=bool(
+                response_text
+            ),
         )
 
     except Exception as exc:
         logger.exception(
-            "Groq connectivity test failed model=%s",
+            (
+                "Groq connectivity test failed "
+                "model=%s error_type=%s"
+            ),
             settings.GROQ_MODEL,
+            type(exc).__name__,
         )
 
         raise HTTPException(
