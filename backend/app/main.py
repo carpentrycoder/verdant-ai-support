@@ -35,6 +35,56 @@ app.add_middleware(
 app.include_router(api_router)
 
 
+# ---------------------------------------------------------
+# Root
+# ---------------------------------------------------------
+
+@app.get(
+    "/",
+    tags=["Health"],
+)
+def root_health_check() -> dict[str, str]:
+    """
+    Root service status.
+
+    Confirms that the API is running and that
+    the PostgreSQL database is reachable.
+    """
+
+    try:
+        with engine.connect() as connection:
+            connection.execute(
+                text("SELECT 1")
+            )
+
+        return {
+            "service": settings.APP_NAME,
+            "version": "1.0.0",
+            "status": "ok",
+            "api": "healthy",
+            "database": "connected",
+            "docs": "/docs",
+            "health": "/health",
+            "database_health": "/health/db",
+        }
+
+    except SQLAlchemyError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "service": settings.APP_NAME,
+                "version": "1.0.0",
+                "status": "degraded",
+                "api": "healthy",
+                "database": "unavailable",
+            },
+        )
+
+
+# ---------------------------------------------------------
+# Application Health
+# ---------------------------------------------------------
+
 @app.get(
     "/health",
     tags=["Health"],
@@ -45,6 +95,10 @@ def health_check() -> dict[str, str]:
         "service": settings.APP_NAME,
     }
 
+
+# ---------------------------------------------------------
+# Database Health
+# ---------------------------------------------------------
 
 @app.get(
     "/health/db",
