@@ -9,6 +9,10 @@ from app.services.knowledge_base import build_knowledge_context
 
 logger = logging.getLogger(__name__)
 
+client = Groq(
+    api_key=settings.GROQ_API_KEY,
+)
+
 
 SYSTEM_PROMPT = """
 You are an AI assistant that prepares draft replies for customer-support
