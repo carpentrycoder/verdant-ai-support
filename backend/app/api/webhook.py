@@ -40,11 +40,8 @@ DbSession = Annotated[
 def normalize_signature(signature: str) -> str:
     """
     Accept either:
-
     sha256=<hex-digest>
-
     or:
-
     <hex-digest>
     """
 
@@ -134,14 +131,28 @@ def verify_webhook_signature(
         }
     },
 )
+
 async def receive_webhook(
     request: Request,
     db: DbSession,
+    x_signature: Annotated[
+        str | None,
+        Header(
+            alias="X-Signature",
+            description=(
+                "HMAC-SHA256 signature "
+                "of the raw request body"
+            ),
+        ),
+    ] = None,
     x_webhook_signature: Annotated[
         str | None,
         Header(
             alias="X-Webhook-Signature",
-            description="HMAC-SHA256 signature of the raw request body",
+            description=(
+                "Backward-compatible webhook "
+                "signature header"
+            ),
         ),
     ] = None,
 ) -> WebhookResponse:
@@ -152,7 +163,12 @@ async def receive_webhook(
     request bytes and the shared WEBHOOK_SECRET.
     """
 
-    if x_webhook_signature is None:
+    received_signature = (
+        x_signature
+        or x_webhook_signature
+    )
+
+    if received_signature is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Missing webhook signature",
@@ -168,7 +184,7 @@ async def receive_webhook(
 
     if not verify_webhook_signature(
         raw_body=raw_body,
-        received_signature=x_webhook_signature,
+        received_signature=received_signature,
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
