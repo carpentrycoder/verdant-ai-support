@@ -23,13 +23,45 @@ verdant-ai-support/
 │   ├── requirements.txt
 │   └── .env.example
 │
-├── frontend/
-│   ├── app/
-│   │   ├── login/
-│   │   ├── customer/
-│   │   └── agent/
+frontend/
+├── app/
+│   ├── layout.js
+│   ├── page.js
+│   ├── providers.js
 │   │
-│   └── components/
+│   ├── login/
+│   │   └── page.js
+│   │
+│   ├── customer/
+│   │   └── page.js
+│   │
+│   └── agent/
+│       ├── page.js
+│       └── conversations/
+│           └── [id]/
+│               └── page.js
+│
+├── components/
+│   ├── AppHeader.js
+│   ├── ViewToggle.js
+│   ├── ConversationList.js
+│   ├── ConversationItem.js
+│   ├── ChatMessage.js
+│   ├── AiDraftEditor.js
+│   └── CustomerSelector.js
+│
+├── lib/
+│   ├── api.js
+│   └── auth.js
+│
+├── public/
+│
+├── .env.local
+├── .env.example
+├── .gitignore
+├── jsconfig.json
+├── next.config.mjs
+└── package.json
 │
 └── README.md
 
@@ -149,3 +181,52 @@ payload type :
     "created_at": "2026-10-30T16:00:00Z"
   }
 }
+
+UI part : 
+
+/customer:
+┌─────────────────────────────────────────────────┐
+│ Verdant & Co            Customer ◉ | Agent ○    │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  Customer                                      │
+│  [ Demo Customer ▼ ]                           │
+│                                                 │
+│  ┌──────────────────────────────────────────┐   │
+│  │ Agent: How can we help?                  │   │
+│  │                                          │   │
+│  │                   Customer message       │   │
+│  │                                          │   │
+│  │ Agent approved response                  │   │
+│  └──────────────────────────────────────────┘   │
+│                                                 │
+│  [ Type a message...                    ][Send] │
+└─────────────────────────────────────────────────┘
+
+Sample-message quick buttons bhi useful hain because PDF explicitly test messages provide karta hai.
+
+Examples:
+
+Plain Text
+[ What is your return policy? ]
+ 
+[ Where is my order? ]
+ 
+[ Is COD available? ]
+
+/agent :
+┌─────────────────────────────────────────────────┐
+│ Verdant Support          Customer ○ | Agent ◉   │
+├─────────────────────────────────────────────────┤
+│ Conversations                                   │
+│                                                 │
+│ Aisha Khan                          10:15        │
+│ Hi, my order #4471 hasn't arrived...            │
+│ ─────────────────────────────────────────────── │
+│ Demo Customer                       09:45        │
+│ What is your return policy?                     │
+└─────────────────────────────────────────────────┘
+
+/agent/conversations/[id] :
+/agent/conversations/[id]
+
