@@ -19,7 +19,6 @@ import {
 } from '@tabler/icons-react';
 
 import {
-  useEffect,
   useState,
 } from 'react';
 
@@ -29,22 +28,6 @@ export default function AiDraftEditor({
   onApprove,
   loading = false,
 }) {
-  const [text, setText] =
-    useState('');
-
-  const [error, setError] =
-    useState('');
-
-
-  useEffect(() => {
-    setText(
-      draft?.draft_text || ''
-    );
-
-    setError('');
-  }, [draft]);
-
-
   if (!draft) {
     return (
       <Paper
@@ -75,6 +58,28 @@ export default function AiDraftEditor({
       </Paper>
     );
   }
+
+  return (
+    <DraftEditorContent
+      key={draft.id}
+      draft={draft}
+      onApprove={onApprove}
+      loading={loading}
+    />
+  );
+}
+
+
+function DraftEditorContent({
+  draft,
+  onApprove,
+  loading,
+}) {
+  const [text, setText] =
+    useState(draft.draft_text || '');
+
+  const [error, setError] =
+    useState('');
 
 
   async function handleApprove() {
@@ -110,9 +115,7 @@ export default function AiDraftEditor({
       }}
     >
       <Stack>
-        <Group
-          justify="space-between"
-        >
+        <Group justify="space-between">
           <Group gap="xs">
             <IconRobot
               size={26}
@@ -155,7 +158,9 @@ export default function AiDraftEditor({
 
         <Textarea
           label="Final response"
-          description="This exact response will be added to the conversation."
+          description={
+            'This exact response will be added to the conversation.'
+          }
           minRows={6}
           autosize
           maxRows={14}

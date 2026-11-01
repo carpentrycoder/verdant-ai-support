@@ -1,4 +1,6 @@
 import json
+import hashlib
+import hmac
 
 from fastapi.testclient import TestClient
 
@@ -105,3 +107,66 @@ def test_duplicate_webhook_returns_existing_message(
         first_body["message_id"]
         == second_body["message_id"]
     )
+
+def test_assessment_webhook_payload_and_signature(
+    client,
+) -> None:
+    payload = {
+        "event_id": "evt_assessment_001",
+        "type": "message.received",
+        "brand_id": "verdant-co",
+        "timestamp": "2026-11-03T10:15:22Z",
+        "customer": {
+            "id": "cust_assessment_001",
+            "name": "Assessment Customer",
+            "phone": "+919800000001",
+        },
+        "message": {
+            "id": "msg_assessment_001",
+            "type": "text",
+            "text": (
+                "Hi, my order #4471 hasn't "
+                "arrived yet. Can I change "
+                "the delivery address?"
+            ),
+        },
+    }
+
+    raw_body = json.dumps(
+        payload,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+    signature = hmac.new(
+        key=(
+            b"verdant-demo-secret-2026"
+        ),
+        msg=raw_body,
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+
+    response = client.post(
+        "/api/v1/webhook",
+        content=raw_body,
+        headers={
+            "Content-Type":
+                "application/json",
+
+            "X-Signature":
+                f"sha256={signature}",
+        },
+    )
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["status"] == "ok"
+    assert body["duplicate"] is False
+    assert body["event_id"] == (
+        "evt_assessment_001"
+    )
+
+    assert body["customer_id"]
+    assert body["conversation_id"]
+    assert body["message_id"]

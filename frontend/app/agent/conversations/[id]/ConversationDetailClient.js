@@ -171,9 +171,19 @@ export default function ConversationDetailClient({
     );
 
 
-  useEffect(() => {
-    loadConversation();
-  }, [loadConversation]);
+    useEffect(() => {
+    let active = true;
+
+    queueMicrotask(() => {
+        if (active) {
+        loadConversation();
+        }
+    });
+
+    return () => {
+        active = false;
+    };
+    }, [loadConversation]);
 
 
   async function handleApprove(

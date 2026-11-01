@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Verdant AI Support - Frontend
 
-## Getting Started
+Next.js + JavaScript + Mantine UI frontend for the Verdant AI customer-support assessment.
 
-First, run the development server:
+## Live Frontend
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+https://verdant-ai-support-frontend.onrender.com/
+
+## Backend API
+
+https://verdant-ai-support.onrender.com
+
+Swagger:
+https://verdant-ai-support.onrender.com/docs
+
+## Features
+
+- Customer and Agent views from one interface
+- Agent authentication with JWT
+- Agent workspace with Open / Closed conversation filters
+- Latest conversation activity and message previews
+- Full conversation history
+- AI draft review and editing
+- Approve AI draft and save the final Agent response
+- Close / reopen conversation workflow
+- Customer simulator for sending support messages
+- Customer view displays customer messages and approved Agent replies only
+- Loading, error, empty and not-found states
+- Server-side API proxy so backend secrets are never exposed to the browser
+
+## Tech Stack
+
+- Next.js 16
+- React 19
+- JavaScript
+- Mantine UI
+- Tabler Icons
+
+## Environment
+
+Create `.env.local`:
+
+```env
+NEXT_API_URL=https://verdant-ai-support.onrender.com
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For local backend testing, point `NEXT_API_URL` to the local backend instead.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Local Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Open `http://localhost:3000`.
 
-To learn more about Next.js, take a look at the following resources:
+Production validation:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run lint
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Application Flow
 
-## Deploy on Vercel
+1. Customer enters an ID, name and phone number.
+2. Customer sends a support message.
+3. Backend creates or reuses the customer's open conversation and generates an AI draft.
+4. Agent signs in and opens the conversation.
+5. Agent reviews or edits the pending AI suggestion.
+6. Agent approves the final response.
+7. Customer refreshes the conversation and sees the approved Agent reply.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Security
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The frontend does not contain database credentials, Groq API keys, JWT secrets, or webhook secrets. Backend requests are sent through the Next.js `/api/backend/*` proxy using the server-side `NEXT_API_URL` configuration.
