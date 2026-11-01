@@ -173,7 +173,17 @@ export default function AgentPage() {
 
 
   useEffect(() => {
-    loadDashboard();
+    let active = true;
+
+    queueMicrotask(() => {
+      if (active) {
+        loadDashboard();
+      }
+    });
+
+    return () => {
+      active = false;
+    };
   }, [loadDashboard]);
 
 
