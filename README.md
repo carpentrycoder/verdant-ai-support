@@ -1,3 +1,16 @@
+## Webhook Testing
+
+The deployed application supports direct signed webhook testing using HMAC-SHA256.
+
+**Webhook Endpoint**
+
+`POST https://verdant-ai-support.onrender.com/api/v1/webhook`
+
+**Signature Header**
+X-Signature: sha256=<HMAC_SHA256_SIGNATURE>
+
+Overview :
+
 # Verdant AI Support
 
 Verdant AI Support is a full-stack AI-assisted customer-support application built for the Software Engineer, AI & Product Engineering take-home assessment. Customers can send support messages, the backend generates a knowledge-base-grounded AI draft, and authenticated Agents can review, edit and approve the reply before it becomes visible to the customer.
